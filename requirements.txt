@@ -1,0 +1,24 @@
+# Required packages for the segmentation project.
+# If you experience version compatibility issues (for example, with keras and segmentation_models),
+# you may need to apply monkey patching in your code to override missing attributes.
+
+# Monkey patching is a dynamic technique to modify or extend a module or class at runtime
+# without changing its original source code. It can be used as a temporary workaround until you
+# can upgrade or downgrade to a compatible version.
+
+numpy
+nibabel
+scipy
+keras
+keras-applications
+keras-preprocessing
+scikit-image
+matplotlib
+scikit-learn
+tensorflow
+pydicom
+git+https://github.com/qubvel/segmentation_models
+ipywidgets
+schedule
+medpy
+seaborn

@@ -1,0 +1,16 @@
+# ===== Python / Virtualenv / Bytecode =====
+venv/
+__pycache__/
+*.pyc
+
+# ===== Data / Large Files You Want to Ignore =====
+Neonatal Test Data - August 1 2024/
+
+# ===== Any Other Large or Temp Files =====
+*.png
+*.h5
+*.mat
+
+# If you have Jupyter notebooks:
+# *.ipynb_checkpoints/
+# *.ipynb
