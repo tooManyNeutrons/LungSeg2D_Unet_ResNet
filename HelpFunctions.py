@@ -17,25 +17,18 @@ except ImportError:
     print("medpy not installed; Hausdorff distance will be skipped.")
     USE_MEDPY = False
 
-# For reading & resizing 2D NIfTI volumes
+###############################################
+# READ 2D NIfTI VOLUMES FOR PROTON & MASK DATA
+###############################################
 def read_2D_nifti_Xe_H_masks(directory, Im_size=256):
     """
-    Reads Proton Images and corresponding Masks from all subdirectories in `directory`.
-    Searches for filenames that contain 'proton' and 'mask' (case-insensitive) and
-    ends with '.nii' or '.nii.gz'.
-
-    If more than one proton/mask candidate is found, the user is prompted to select
-    exactly which file to use. The user can also skip the entire directory if they wish.
-
-    Args:
-        directory (str): Path to the dataset containing subfolders for each subject.
-        Im_size (int): Image size to resize to (default: 256).
-
+    Reads proton images and corresponding masks from subdirectories in `directory`.
+    Automatically selects a mask file if one candidate has a basename exactly "mask.nii".
+    
     Returns:
-        (proton_images, masks, subject_paths):
-            proton_images: shape (num_subjects, H, W, num_slices)
-            masks:         shape (num_subjects, H, W, num_slices)
-            subject_paths: list of subfolder paths
+        proton_images: shape (num_subjects, H, W, num_slices)
+        masks:         shape (num_subjects, H, W, num_slices)
+        subject_paths: list of subfolder paths
     """
     # Gather subdirectories
     subject_dirs = sorted(
@@ -49,11 +42,11 @@ def read_2D_nifti_Xe_H_masks(directory, Im_size=256):
     subject_paths = []
 
     for subject_dir in subject_dirs:
-        # Find any file matching proton or mask patterns
+        # Find files matching proton or mask patterns
         proton_candidates = glob.glob(os.path.join(subject_dir, '*[Pp]roton*.*nii*'))
         mask_candidates   = glob.glob(os.path.join(subject_dir, '*[Mm]ask*.*nii*'))
 
-        # If we found none, skip
+        # Skip subject if no candidates found
         if not proton_candidates:
             print(f"No proton files found in {subject_dir}. Skipping.")
             continue
@@ -61,10 +54,49 @@ def read_2D_nifti_Xe_H_masks(directory, Im_size=256):
             print(f"No mask files found in {subject_dir}. Skipping.")
             continue
 
-        # Let user select among the proton candidates if there's more than 1
+        # Automatically select the mask file if one candidate has basename "mask.nii"
+        selected_mask = None
+        for candidate in mask_candidates:
+            if os.path.basename(candidate).lower() == "mask.nii":
+                selected_mask = candidate
+                print(f"\nSubject: {subject_dir}")
+                print(f"Automatically selected mask file: {selected_mask}")
+                break
+
+        # If no automatic selection, prompt the user as before
+        if selected_mask is None:
+            if len(mask_candidates) == 1:
+                selected_mask = mask_candidates[0]
+                print(f"\nSubject: {subject_dir}")
+                print(f"Found a single mask candidate: {selected_mask}")
+            else:
+                print(f"\nSubject: {subject_dir}")
+                print("Multiple mask candidates found:")
+                for i, mfile in enumerate(mask_candidates):
+                    print(f"  {i+1}) {mfile}")
+                print("  S) Skip this subject")
+                while True:
+                    choice = input("Select the mask file by number, or 'S' to skip: ")
+                    if choice.lower() == 's':
+                        print("Skipping this subject...")
+                        selected_mask = None
+                        break
+                    try:
+                        idx = int(choice) - 1
+                        if idx < 0 or idx >= len(mask_candidates):
+                            print("Invalid choice. Try again.")
+                        else:
+                            selected_mask = mask_candidates[idx]
+                            print(f"Selected mask file: {selected_mask}")
+                            break
+                    except ValueError:
+                        print("Invalid input. Please enter a number or 'S'.")
+                if selected_mask is None:
+                    continue  # Skip this subject if user chose to skip
+
+        # Handle proton candidates similarly (here we assume one candidate or prompt user)
         if len(proton_candidates) == 1:
             proton_file = proton_candidates[0]
-            print(f"\nSubject: {subject_dir}")
             print(f"Found a single proton candidate: {proton_file}")
         else:
             print(f"\nSubject: {subject_dir}")
@@ -72,7 +104,6 @@ def read_2D_nifti_Xe_H_masks(directory, Im_size=256):
             for i, pfile in enumerate(proton_candidates):
                 print(f"  {i+1}) {pfile}")
             print("  S) Skip this subject")
-            # Ask user to pick
             while True:
                 choice = input("Select the proton file by number, or 'S' to skip: ")
                 if choice.lower() == 's':
@@ -92,38 +123,7 @@ def read_2D_nifti_Xe_H_masks(directory, Im_size=256):
             if proton_file is None:
                 continue
 
-        # Let user select among the mask candidates if there's more than 1
-        if len(mask_candidates) == 1:
-            mask_file = mask_candidates[0]
-            print(f"Found a single mask candidate: {mask_file}")
-        else:
-            print("Multiple mask candidates found:")
-            for i, mfile in enumerate(mask_candidates):
-                print(f"  {i+1}) {mfile}")
-            print("  S) Skip this subject")
-            # Ask user to pick
-            while True:
-                choice = input("Select the mask file by number, or 'S' to skip: ")
-                if choice.lower() == 's':
-                    print("Skipping this subject...")
-                    mask_file = None
-                    break
-                try:
-                    idx = int(choice) - 1
-                    if idx < 0 or idx >= len(mask_candidates):
-                        print("Invalid choice. Try again.")
-                    else:
-                        mask_file = mask_candidates[idx]
-                        print(f"Selected mask file: {mask_file}")
-                        break
-                except ValueError:
-                    print("Invalid input. Please enter a number or 'S'.")
-            if mask_file is None:
-                continue
-
-        print(f"\nLoading {proton_file} and {mask_file}...")
-
-        # Now load the selected files
+        print(f"\nLoading {proton_file} and {selected_mask}...")
         try:
             proton_data = nib.load(proton_file).get_fdata()
             proton_data = resize(
@@ -131,27 +131,25 @@ def read_2D_nifti_Xe_H_masks(directory, Im_size=256):
                 (Im_size, Im_size, proton_data.shape[2]),
                 mode='constant',
                 preserve_range=True,
-                order=1  # bilinear for images
+                order=1  # bilinear interpolation for images
             )
 
-            mask_data = nib.load(mask_file).get_fdata()
+            mask_data = nib.load(selected_mask).get_fdata()
             mask_data = resize(
                 mask_data,
                 (Im_size, Im_size, mask_data.shape[2]),
                 mode='constant',
                 preserve_range=True,
-                order=0  # nearest-neighbor
+                order=0  # nearest-neighbor for masks
             )
 
-            # Ensure same number of slices
+            # Ensure the number of slices match; trim if necessary.
             if mask_data.shape[2] != proton_data.shape[2]:
                 min_slices = min(proton_data.shape[2], mask_data.shape[2])
-                print(f"Warning: slice mismatch in {subject_dir}, "
-                      f"trimming to {min_slices} slices.")
+                print(f"Warning: slice mismatch in {subject_dir}, trimming to {min_slices} slices.")
                 proton_data = proton_data[..., :min_slices]
-                mask_data   = mask_data[..., :min_slices]
+                mask_data = mask_data[..., :min_slices]
 
-            # Binarize
             mask_data = (mask_data > 0).astype(np.uint8)
 
             proton_images_list.append(proton_data)
@@ -159,13 +157,12 @@ def read_2D_nifti_Xe_H_masks(directory, Im_size=256):
             subject_paths.append(subject_dir)
 
         except Exception as e:
-            print(f"Error loading {proton_file} or {mask_file} in {subject_dir}: {e}")
+            print(f"Error loading {proton_file} or {selected_mask} in {subject_dir}: {e}")
             print("Skipping this subject.")
             continue
 
     proton_images = np.array(proton_images_list, dtype=np.float32)
-    masks         = np.array(masks_list, dtype=np.uint8)
-
+    masks = np.array(masks_list, dtype=np.uint8)
     return proton_images, masks, subject_paths
 
 # ---------------------------------------------------------------------
@@ -180,17 +177,15 @@ def save_masks(final_mask, mat_path, nifti_path, png_dir):
     print(f"Generated mask saved as {nifti_path}.")
 
     os.makedirs(png_dir, exist_ok=True)
-
-    # final_mask is now shape (H, W, num_slices)
+    # final_mask is shape (H, W, num_slices)
     for i in range(final_mask.shape[2]):
         plt.imsave(
             os.path.join(png_dir, f"slice_{i + 1:03}.png"),
-            final_mask[:, :, i],  # shape (H, W)
+            final_mask[:, :, i],
             cmap='gray'
         )
     print(f"Predicted slices saved as PNGs in {png_dir}.")
-
-
+    
 def save_training_plots(history, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     epochs = range(1, len(history.history['loss']) + 1)
@@ -216,8 +211,7 @@ def save_training_plots(history, output_dir):
     plt.legend()
     plt.savefig(os.path.join(output_dir, 'training_validation_iou.png'), dpi=300)
     plt.close()
-
-
+    
 def visualize_image_and_mask(image, mask, title="Image and Mask"):
     plt.figure(figsize=(8, 4))
     plt.subplot(1, 2, 1)
@@ -226,8 +220,10 @@ def visualize_image_and_mask(image, mask, title="Image and Mask"):
     plt.subplot(1, 2, 2)
     plt.title(f"{title} - Mask")
     plt.imshow(mask, cmap='gray')
-    plt.show()
-
+    # Show non-blocking and auto-close after 3 seconds
+    plt.show(block=False)
+    plt.pause(3)
+    plt.close()
 
 def visualize_slice(image_volume, mask_volume, slice_idx, title_prefix=""):
     plt.figure(figsize=(10, 5))
@@ -237,8 +233,9 @@ def visualize_slice(image_volume, mask_volume, slice_idx, title_prefix=""):
     plt.subplot(1, 2, 2)
     plt.title(f"{title_prefix} - Mask (Slice {slice_idx})")
     plt.imshow(mask_volume[:, :, slice_idx], cmap='gray')
-    plt.show()
-
+    plt.show(block=False)
+    plt.pause(3)
+    plt.close()
 
 def visualize_augmented_samples(generator, num_samples=3):
     for _ in range(num_samples):
@@ -250,26 +247,26 @@ def visualize_augmented_samples(generator, num_samples=3):
         plt.subplot(1, 2, 2)
         plt.title("Augmented Mask")
         plt.imshow(mask_batch[0, :, :, 0], cmap='gray')
-        plt.show()
-
+        plt.show(block=False)
+        plt.pause(3)
+        plt.close()
 
 def visualize_augmented_samples_overlay(generator, num_samples=3):
     for _ in range(num_samples):
         img_batch, mask_batch = next(generator)
         image = img_batch[0]           # (H, W, 3)
-        mask = mask_batch[0, :, :, 0]  # (H, W)
-
+        mask = mask_batch[0, :, :, 0]    # (H, W)
         plt.figure(figsize=(10, 5))
         plt.subplot(1, 2, 1)
         plt.title("Augmented Image")
         plt.imshow(image[..., 0], cmap='gray')
-
         plt.subplot(1, 2, 2)
         plt.title("Mask Overlay")
         plt.imshow(image[..., 0], cmap='gray')
         plt.imshow(mask, alpha=0.3, cmap='Reds')  # red overlay
-        plt.show()
-
+        plt.show(block=False)
+        plt.pause(3)
+        plt.close()
 
 def plot_validation_dice(y_true, y_pred, output_dir):
     """ Quick bar plot of dice on entire validation set. """
@@ -287,7 +284,6 @@ def plot_validation_dice(y_true, y_pred, output_dir):
     plt.savefig(os.path.join(output_dir, 'validation_dice.png'), dpi=300)
     plt.close()
     print("Validation Dice coefficient:", dice_value)
-
 
 def evaluate_and_save_segmentation_plots(
     Y_true,         # shape: (N, H, W, 1)   or (N, H, W)

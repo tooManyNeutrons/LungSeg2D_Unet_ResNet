@@ -112,19 +112,6 @@ def training_job():
 
     print("X_train shape:", X_train.shape)
     print("Y_train shape:", Y_train.shape)
-
-    for i in range(Y_train.shape[0]):
-        s = Y_train[i].sum()
-        if s > 0:
-            print(f"Slice i={i} has sum={s}")
-
-    for i in range(5):
-        idx = random.randint(0, X_train.shape[0] - 1)
-        # Just check if there's ANY 1's in that mask
-        print(f"Slice idx={idx}, mask sum={Y_train[idx].sum()}")
-        HF.visualize_image_and_mask(X_train[idx, ..., 0],
-                                Y_train[idx, ..., 0],
-                                title=f"Unaugmented slice {idx}")
     
     # ========== LOOP OVER VAL SUBJECTS ==========
     X_val_list = []
@@ -324,3 +311,10 @@ while True:
     sleep_time = max(0, 86400 - elapsed)
     print(f"Training job finished in {elapsed:.2f} seconds. Sleeping for {sleep_time:.2f} seconds before next run.")
     time.sleep(sleep_time)
+
+if __name__ == "__main__":
+    # Instead of the infinite while loop, run a single training job.
+    start_time = time.time()
+    training_job()  # Run one training job
+    elapsed = time.time() - start_time
+    print(f"Training job finished in {elapsed:.2f} seconds.")

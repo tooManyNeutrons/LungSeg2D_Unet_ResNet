@@ -9,14 +9,12 @@ OUTPUT_BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(_
 # ====================================================
 # DATA LOADING & PREPROCESSING PARAMETERS
 # ====================================================
-# Path to the directory with your data and image size settings.
 DATA_PATH = 'Neonatal Test Data - August 1 2024'
 IMAGE_SIZE = 256  # assumed square images
 
 # ====================================================
 # DATA AUGMENTATION PARAMETERS
 # ====================================================
-# Parameters for image augmentation (applied to the input images)
 IMG_AUGMENTATION = {
     'rotation_range': 15,
     'width_shift_range': 0.1,
@@ -28,8 +26,6 @@ IMG_AUGMENTATION = {
     'fill_mode': 'nearest'
 }
 
-# Parameters for mask augmentation.
-# Note: The preprocessing_function ensures masks are binary and converted to float32.
 MASK_AUGMENTATION = {
     'rotation_range': 15,
     'width_shift_range': 0.05,
@@ -39,8 +35,7 @@ MASK_AUGMENTATION = {
     'horizontal_flip': True,
     'fill_mode': 'constant',
     'cval': 0,
-    # Do we need to preprocess the masks? If we do, then uncomment 1st line and if we don't comment 2nd line.
-    # 'preprocessing_function': lambda x: np.where(x > 0.1, 1, 0).astype('float32')
+    # If you need to preprocess the masks, update this function.
     'preprocessing_function': None
 }
 

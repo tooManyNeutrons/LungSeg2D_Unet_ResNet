@@ -1,0 +1,108 @@
+[
+    {
+      "DATA_PATH": "Neonatal Test Data - August 1 2024",
+      "IMAGE_SIZE": 256,
+      "IMG_AUGMENTATION": {
+        "rotation_range": 15,
+        "width_shift_range": 0.1,
+        "height_shift_range": 0.1,
+        "shear_range": 0.05,
+        "zoom_range": 0.1,
+        "horizontal_flip": true,
+        "vertical_flip": false,
+        "fill_mode": "nearest"
+      },
+      "MASK_AUGMENTATION": {
+        "rotation_range": 15,
+        "width_shift_range": 0.05,
+        "height_shift_range": 0.05,
+        "shear_range": 0.05,
+        "zoom_range": 0.1,
+        "horizontal_flip": true,
+        "fill_mode": "constant",
+        "cval": 0,
+        "preprocessing_function": null
+      },
+      "BATCH_SIZE": 8,
+      "NUM_EPOCHS": 3,
+      "TRAIN_TEST_SPLIT": 0.25,
+      "LEARNING_RATE": 0.0001,
+      "BACKBONE": "resnet50",
+      "MODEL_SAVE_PATH_TEMPLATE": "Resnet_model_Xe_2D_Vent_{}epochs.hdf5",
+      "MATLAB_SAVE_X_TRAIN": "Xe_X_train.mat",
+      "MATLAB_SAVE_X_VAL": "Xe_X_val.mat",
+      "MATLAB_SAVE_Y_TRAIN": "Xe_Y_train.mat",
+      "MATLAB_SAVE_Y_VAL": "Xe_Y_val.mat"
+    },
+    {
+      "DATA_PATH": "Neonatal Test Data - August 1 2024",
+      "IMAGE_SIZE": 256,
+      "IMG_AUGMENTATION": {
+        "rotation_range": 15,
+        "width_shift_range": 0.1,
+        "height_shift_range": 0.1,
+        "shear_range": 0.05,
+        "zoom_range": 0.1,
+        "horizontal_flip": true,
+        "vertical_flip": false,
+        "fill_mode": "nearest"
+      },
+      "MASK_AUGMENTATION": {
+        "rotation_range": 15,
+        "width_shift_range": 0.05,
+        "height_shift_range": 0.05,
+        "shear_range": 0.05,
+        "zoom_range": 0.1,
+        "horizontal_flip": true,
+        "fill_mode": "constant",
+        "cval": 0,
+        "preprocessing_function": null
+      },
+      "BATCH_SIZE": 16,
+      "NUM_EPOCHS": 5,
+      "TRAIN_TEST_SPLIT": 0.25,
+      "LEARNING_RATE": 0.0001,
+      "BACKBONE": "resnet50",
+      "MODEL_SAVE_PATH_TEMPLATE": "Resnet_model_Xe_2D_Vent_{}epochs.hdf5",
+      "MATLAB_SAVE_X_TRAIN": "Xe_X_train.mat",
+      "MATLAB_SAVE_X_VAL": "Xe_X_val.mat",
+      "MATLAB_SAVE_Y_TRAIN": "Xe_Y_train.mat",
+      "MATLAB_SAVE_Y_VAL": "Xe_Y_val.mat"
+    },
+    {
+      "DATA_PATH": "Neonatal Test Data - August 1 2024",
+      "IMAGE_SIZE": 256,
+      "IMG_AUGMENTATION": {
+        "rotation_range": 15,
+        "width_shift_range": 0.1,
+        "height_shift_range": 0.1,
+        "shear_range": 0.05,
+        "zoom_range": 0.1,
+        "horizontal_flip": true,
+        "vertical_flip": false,
+        "fill_mode": "nearest"
+      },
+      "MASK_AUGMENTATION": {
+        "rotation_range": 15,
+        "width_shift_range": 0.05,
+        "height_shift_range": 0.05,
+        "shear_range": 0.05,
+        "zoom_range": 0.1,
+        "horizontal_flip": true,
+        "fill_mode": "constant",
+        "cval": 0,
+        "preprocessing_function": null
+      },
+      "BATCH_SIZE": 16,
+      "NUM_EPOCHS": 8,
+      "TRAIN_TEST_SPLIT": 0.25,
+      "LEARNING_RATE": 0.00005,
+      "BACKBONE": "resnet50",
+      "MODEL_SAVE_PATH_TEMPLATE": "Resnet_model_Xe_2D_Vent_{}epochs.hdf5",
+      "MATLAB_SAVE_X_TRAIN": "Xe_X_train.mat",
+      "MATLAB_SAVE_X_VAL": "Xe_X_val.mat",
+      "MATLAB_SAVE_Y_TRAIN": "Xe_Y_train.mat",
+      "MATLAB_SAVE_Y_VAL": "Xe_Y_val.mat"
+    }
+  ]
+  
