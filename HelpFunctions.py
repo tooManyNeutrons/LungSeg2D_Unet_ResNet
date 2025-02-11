@@ -1,6 +1,7 @@
 # HelpFunctions.py
 
 import os
+import glob
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage.transform import resize
@@ -20,7 +21,11 @@ except ImportError:
 def read_2D_nifti_Xe_H_masks(directory, Im_size=256):
     """
     Reads Proton Images and corresponding Masks from all subdirectories in `directory`.
-    Expects "proton.nii" and "mask.nii" in each subject folder.
+    Searches for filenames that contain 'proton' and 'mask' (case-insensitive) and
+    ends with '.nii' or '.nii.gz'.
+
+    If more than one proton/mask candidate is found, the user is prompted to select
+    exactly which file to use. The user can also skip the entire directory if they wish.
 
     Args:
         directory (str): Path to the dataset containing subfolders for each subject.
@@ -32,6 +37,7 @@ def read_2D_nifti_Xe_H_masks(directory, Im_size=256):
             masks:         shape (num_subjects, H, W, num_slices)
             subject_paths: list of subfolder paths
     """
+    # Gather subdirectories
     subject_dirs = sorted(
         os.path.join(directory, d)
         for d in os.listdir(directory)
@@ -43,24 +49,91 @@ def read_2D_nifti_Xe_H_masks(directory, Im_size=256):
     subject_paths = []
 
     for subject_dir in subject_dirs:
-        proton_file = os.path.join(subject_dir, "proton.nii")
-        mask_file   = os.path.join(subject_dir, "mask.nii")
+        # Find any file matching proton or mask patterns
+        proton_candidates = glob.glob(os.path.join(subject_dir, '*[Pp]roton*.*nii*'))
+        mask_candidates   = glob.glob(os.path.join(subject_dir, '*[Mm]ask*.*nii*'))
 
-        if os.path.isfile(proton_file) and os.path.isfile(mask_file):
-            print(f"Processing: {subject_dir}")
-            subject_paths.append(subject_dir)
+        # If we found none, skip
+        if not proton_candidates:
+            print(f"No proton files found in {subject_dir}. Skipping.")
+            continue
+        if not mask_candidates:
+            print(f"No mask files found in {subject_dir}. Skipping.")
+            continue
 
-            # Load proton
+        # Let user select among the proton candidates if there's more than 1
+        if len(proton_candidates) == 1:
+            proton_file = proton_candidates[0]
+            print(f"\nSubject: {subject_dir}")
+            print(f"Found a single proton candidate: {proton_file}")
+        else:
+            print(f"\nSubject: {subject_dir}")
+            print("Multiple proton candidates found:")
+            for i, pfile in enumerate(proton_candidates):
+                print(f"  {i+1}) {pfile}")
+            print("  S) Skip this subject")
+            # Ask user to pick
+            while True:
+                choice = input("Select the proton file by number, or 'S' to skip: ")
+                if choice.lower() == 's':
+                    print("Skipping this subject...")
+                    proton_file = None
+                    break
+                try:
+                    idx = int(choice) - 1
+                    if idx < 0 or idx >= len(proton_candidates):
+                        print("Invalid choice. Try again.")
+                    else:
+                        proton_file = proton_candidates[idx]
+                        print(f"Selected proton file: {proton_file}")
+                        break
+                except ValueError:
+                    print("Invalid input. Please enter a number or 'S'.")
+            if proton_file is None:
+                continue
+
+        # Let user select among the mask candidates if there's more than 1
+        if len(mask_candidates) == 1:
+            mask_file = mask_candidates[0]
+            print(f"Found a single mask candidate: {mask_file}")
+        else:
+            print("Multiple mask candidates found:")
+            for i, mfile in enumerate(mask_candidates):
+                print(f"  {i+1}) {mfile}")
+            print("  S) Skip this subject")
+            # Ask user to pick
+            while True:
+                choice = input("Select the mask file by number, or 'S' to skip: ")
+                if choice.lower() == 's':
+                    print("Skipping this subject...")
+                    mask_file = None
+                    break
+                try:
+                    idx = int(choice) - 1
+                    if idx < 0 or idx >= len(mask_candidates):
+                        print("Invalid choice. Try again.")
+                    else:
+                        mask_file = mask_candidates[idx]
+                        print(f"Selected mask file: {mask_file}")
+                        break
+                except ValueError:
+                    print("Invalid input. Please enter a number or 'S'.")
+            if mask_file is None:
+                continue
+
+        print(f"\nLoading {proton_file} and {mask_file}...")
+
+        # Now load the selected files
+        try:
             proton_data = nib.load(proton_file).get_fdata()
             proton_data = resize(
                 proton_data,
                 (Im_size, Im_size, proton_data.shape[2]),
                 mode='constant',
                 preserve_range=True,
-                order=1  # bilinear
+                order=1  # bilinear for images
             )
 
-            # Load mask
             mask_data = nib.load(mask_file).get_fdata()
             mask_data = resize(
                 mask_data,
@@ -73,30 +146,27 @@ def read_2D_nifti_Xe_H_masks(directory, Im_size=256):
             # Ensure same number of slices
             if mask_data.shape[2] != proton_data.shape[2]:
                 min_slices = min(proton_data.shape[2], mask_data.shape[2])
-                print(f"Warning: slice mismatch in {subject_dir}, trimming to {min_slices} slices.")
+                print(f"Warning: slice mismatch in {subject_dir}, "
+                      f"trimming to {min_slices} slices.")
                 proton_data = proton_data[..., :min_slices]
                 mask_data   = mask_data[..., :min_slices]
-
-            # Optional rolling or flipping can go here
-            shift_offset = 0
-            if shift_offset != 0:
-                mask_data = np.roll(mask_data, shift_offset, axis=2)
-
-            # Print stats
-            # print("mask_data stats:", mask_data.min(), mask_data.max(), np.unique(mask_data))
 
             # Binarize
             mask_data = (mask_data > 0).astype(np.uint8)
 
             proton_images_list.append(proton_data)
             masks_list.append(mask_data)
+            subject_paths.append(subject_dir)
 
-    # Convert to np arrays
+        except Exception as e:
+            print(f"Error loading {proton_file} or {mask_file} in {subject_dir}: {e}")
+            print("Skipping this subject.")
+            continue
+
     proton_images = np.array(proton_images_list, dtype=np.float32)
-    masks         = np.array(masks_list,         dtype=np.uint8)
+    masks         = np.array(masks_list, dtype=np.uint8)
 
     return proton_images, masks, subject_paths
-
 
 # ---------------------------------------------------------------------
 # Other Utility Functions

@@ -224,7 +224,7 @@ def training_job():
         ModelCheckpoint(os.path.join(output_dir, 'best_model.keras'), monitor='val_loss', save_best_only=True)
     ]
     
-    steps_per_epoch = 1 # len(X_train) // batch_size
+    steps_per_epoch = len(X_train) // batch_size
     validation_steps = len(X_val) // batch_size
     num_epochs = cfg.NUM_EPOCHS
     
