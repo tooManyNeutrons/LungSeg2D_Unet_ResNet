@@ -281,20 +281,24 @@ def training_job():
     #
     # which is more robust if the subject order changed.
 
-    i = val_subj_idx[0]  # pick first subject in the validation set
-    subject_slice_start = (i * num_slices)
-    subject_slice_end   = (i + 1) * num_slices
-    subject_pred_volume = Y_pred_thresholded[subject_slice_start:subject_slice_end]
-    
-    print("subject_pred_volume shape:", subject_pred_volume.shape)
+    # Do this:
+    s = val_subj_idx[0]  # This is the actual subject ID
+    start_idx, end_idx = slice_map_val[s]  # Retrieve the stored slice range
+    subject_pred_volume = Y_pred_thresholded[start_idx:end_idx]  # shape (num_slices, H, W, 1)
+
+    # Then transpose/reshape so that the slice dimension goes last (H,W,slices):
+    subject_pred_volume = np.transpose(subject_pred_volume.squeeze(-1), (1, 2, 0))  
+    # shape now is (H, W, num_slices)
+
+    print("subject_pred_volume shape:", subject_pred_volume.shape)  # e.g. (256,256,256)
     
     masks_dir = os.path.join(output_dir, "masks")
     os.makedirs(masks_dir, exist_ok=True)
     
-    HF.save_masks(subject_pred_volume, 
-               mat_path=os.path.join(output_dir, 'final_gen_mask.mat'),
-               nifti_path=os.path.join(output_dir, 'final_gen_mask.nii.gz'),
-               png_dir=masks_dir)
+    HF.save_masks(subject_pred_volume,
+                mat_path=os.path.join(output_dir, "final_gen_mask.mat"),
+                nifti_path=os.path.join(output_dir, "final_gen_mask.nii.gz"),
+                png_dir=masks_dir)
     
     # ----------------------------------------------------------
     # SAVE MODEL AND DATA

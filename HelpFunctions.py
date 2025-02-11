@@ -180,10 +180,14 @@ def save_masks(final_mask, mat_path, nifti_path, png_dir):
     print(f"Generated mask saved as {nifti_path}.")
 
     os.makedirs(png_dir, exist_ok=True)
+
+    # final_mask is now shape (H, W, num_slices)
     for i in range(final_mask.shape[2]):
-        plt.imsave(os.path.join(png_dir, f"slice_{i+1:03}.png"),
-                   final_mask[:, :, i],
-                   cmap='gray')
+        plt.imsave(
+            os.path.join(png_dir, f"slice_{i + 1:03}.png"),
+            final_mask[:, :, i],  # shape (H, W)
+            cmap='gray'
+        )
     print(f"Predicted slices saved as PNGs in {png_dir}.")
 
 
