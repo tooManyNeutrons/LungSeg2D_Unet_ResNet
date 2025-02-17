@@ -1,7 +1,7 @@
 import json
 import time
 import config as cfg
-import Main_Resnet_Xe  # This module now only provides training_job() without auto-running it
+import LungSegmentation2D_Unet_BBResnet.Main_Resnet as Main_Resnet  # This module now only provides training_job() without auto-running it
 import os
 
 def load_param_options(json_path="param_options.json"):
@@ -41,7 +41,7 @@ def run_experiments():
             
             try:
                 # Run the training job for the current configuration.
-                Main_Resnet_Xe.training_job()
+                Main_Resnet.training_job()
             except KeyboardInterrupt:
                 print("Training job was interrupted by user. Exiting experiment queue.")
                 return

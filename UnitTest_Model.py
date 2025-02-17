@@ -1,8 +1,8 @@
-# test_main_resnet_xe.py
+# test_main_resnet.py
 import unittest
 import time
 import config as cfg
-import Main_Resnet_Xe  # Must not auto-start the loop
+import LungSegmentation2D_Unet_BBResnet.Main_Resnet as Main_Resnet  # Must not auto-start the loop
 
 class TestMainResnetXe(unittest.TestCase):
     def test_run_one_epoch(self):
@@ -10,7 +10,7 @@ class TestMainResnetXe(unittest.TestCase):
         cfg.BATCH_SIZE = 4
 
         start_time = time.time()
-        Main_Resnet_Xe.training_job()  # run once
+        Main_Resnet.training_job()  # run once
         elapsed = time.time() - start_time
 
         # No time-based checks; just confirm it runs to completion.

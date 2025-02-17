@@ -1,7 +1,7 @@
 # batch_runs.py
 import time
 import config as cfg
-import Main_Resnet_Xe  # Make sure it does NOT auto-run training on import
+import LungSegmentation2D_Unet_BBResnet.Main_Resnet as Main_Resnet  # Make sure it does NOT auto-run training on import
 import os
 
 # Define different parameter sets you want to try:
@@ -29,7 +29,7 @@ def run_queued_experiments():
 
         # Run your training job exactly once
         start_time = time.time()
-        Main_Resnet_Xe.training_job()
+        Main_Resnet.training_job()
         elapsed = time.time() - start_time
         print(f"Run {i} completed in {elapsed:.2f} seconds.")
 
