@@ -3,10 +3,10 @@
 import time
 
 # Import your config to override certain parameters
-from LungSegmentation2D_Unet_BBResnet import config as cfg
+import config as cfg
 
 # Import your main script, which has training_job()
-from LungSegmentation2D_Unet_BBResnet import Main_Resnet as Main_Resnet  # Ensure the 'while True:' loop is removed or guarded in Main_Resnet_Xe
+import Main_Resnet as Main_Resnet  # Ensure the 'while True:' loop is removed or guarded in Main_Resnet_Xe
 
 def run_test():
     """

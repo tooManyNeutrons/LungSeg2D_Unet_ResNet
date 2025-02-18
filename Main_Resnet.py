@@ -24,10 +24,10 @@ except ImportError:
 
 # TensorFlow / Keras Imports
 import tensorflow as tf
-from keras import backend as K
-from keras._tf_keras.keras.preprocessing.image import ImageDataGenerator
-from keras._tf_keras.keras.callbacks import EarlyStopping, ModelCheckpoint
-from keras._tf_keras.keras.optimizers import Adam
+import keras as K
+#from tf.keras.preprocessing.image import ImageDataGenerator
+#from tf.keras.callbacks import tf.keras.callbacks.tf.keras.callbacks.EarlyStopping, tf.keras.callbacks.ModelCheckpoint
+#from tf.keras.optimizers import tf.keras.optimizers.Adam
 from keras import utils as keras_utils
 # Monkey-patch: If 'generic_utils' is missing, map it to get_custom_objects
 if not hasattr(keras_utils, "generic_utils"):
@@ -37,13 +37,13 @@ if not hasattr(keras_utils, "generic_utils"):
 import segmentation_models as sm
 
 # Local Modules
-from LungSegmentation2D_Unet_BBResnet import HelpFunctions as HF  # Assumes this module handles data I/O
+import HelpFunctions as HF  # Assumes this module handles data I/O
 from matplotlib.widgets import Slider  # For interactive visualization
 
 # ====================================================
 # Import configuration
 # ====================================================
-from LungSegmentation2D_Unet_BBResnet import config as cfg
+import config as cfg
 
 # ====================================================
 # TRAINING JOB FUNCTION
@@ -151,8 +151,8 @@ def training_job():
     # ----------------------------------------------------------
     # DATA AUGMENTATION 
     # ----------------------------------------------------------
-    img_datagen = ImageDataGenerator(**cfg.IMG_AUGMENTATION)
-    mask_datagen = ImageDataGenerator(**cfg.MASK_AUGMENTATION)
+    img_datagen = tf.keras.preprocessing.image.ImageDataGenerator(**cfg.IMG_AUGMENTATION)
+    mask_datagen = tf.keras.preprocessing.image.ImageDataGenerator(**cfg.MASK_AUGMENTATION)
 
     batch_size = cfg.BATCH_SIZE
     seed = 42
@@ -172,7 +172,7 @@ def training_job():
     # Seeing a few augmented samples
     HF.visualize_augmented_samples_overlay(train_generator, num_samples=5)
 
-    # Seeing a few augmented samples
+    # Seeing a few augmented samplesEarlyStopping
     HF.visualize_augmented_samples(train_generator, num_samples=2)
 
     # ----------------------------------------------------------
@@ -189,17 +189,17 @@ def training_job():
     )
 
     def dice_loss(y_true, y_pred, smooth=1e-6):
-        y_true_f = K.flatten(y_true)
-        y_pred_f = K.flatten(y_pred)
-        intersection = K.sum(y_true_f * y_pred_f)
-        return 1 - (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+        y_true_f = tf.keras.backend.Flatten(y_true)
+        y_pred_f = tf.keras.backend.Flatten(y_pred)
+        intersection = tf.math.reduce_sum(y_true_f * y_pred_f)
+        return 1 - (2. * intersection + smooth) / (tf.math.reduce_sum(y_true_f) + (y_pred_f) + smooth)
     
     def bce_dice_loss(y_true, y_pred):
         bce = tf.keras.losses.BinaryCrossentropy()(y_true, y_pred)
         dsc = dice_loss(y_true, y_pred)
         return bce + dsc
     
-    model.compile(optimizer=Adam(learning_rate=cfg.LEARNING_RATE),
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=cfg.LEARNING_RATE),
                   loss=bce_dice_loss,
                   metrics=[sm.metrics.iou_score])
     
@@ -207,8 +207,8 @@ def training_job():
 
     # MODEL TRAINING
     callbacks = [
-        EarlyStopping(monitor='val_loss', patience=20, restore_best_weights=True),
-        ModelCheckpoint(os.path.join(output_dir, 'best_model.keras'), monitor='val_loss', save_best_only=True)
+        tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=20, restore_best_weights=True),
+        tf.keras.callbacks.ModelCheckpoint(os.path.join(output_dir, 'best_model.keras'), monitor='val_loss', save_best_only=True)
     ]
     
     steps_per_epoch = len(X_train) // batch_size
