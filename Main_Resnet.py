@@ -37,13 +37,13 @@ if not hasattr(keras_utils, "generic_utils"):
 import segmentation_models as sm
 
 # Local Modules
-from LungSegmentation2D_Unet_BBResnet import HelpFunctions as HF  # Assumes this module handles data I/O
+import HelpFunctions as HF  # Assumes this module handles data I/O
 from matplotlib.widgets import Slider  # For interactive visualization
 
 # ====================================================
 # Import configuration
 # ====================================================
-from LungSegmentation2D_Unet_BBResnet import config as cfg
+import config as cfg
 
 # ====================================================
 # TRAINING JOB FUNCTION
