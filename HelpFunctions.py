@@ -209,15 +209,15 @@ def save_training_plots(history, output_dir):
     plt.close()
 
     # IoU plot
-    plt.figure()
-    plt.plot(epochs, history.history['iou_score'], 'y', label='Training IoU')
-    plt.plot(epochs, history.history['val_iou_score'], 'r', label='Validation IoU')
-    plt.title('Training and Validation IoU')
-    plt.xlabel('Epochs')
-    plt.ylabel('IoU Score')
-    plt.legend()
-    plt.savefig(os.path.join(output_dir, 'training_validation_iou.png'), dpi=300)
-    plt.close()
+    # plt.figure()
+    # plt.plot(epochs, history.history['iou_score'], 'y', label='Training IoU')
+    # plt.plot(epochs, history.history['val_iou_score'], 'r', label='Validation IoU')
+    # plt.title('Training and Validation IoU')
+    # plt.xlabel('Epochs')
+    # plt.ylabel('IoU Score')
+    # plt.legend()
+    # plt.savefig(os.path.join(output_dir, 'training_validation_iou.png'), dpi=300)
+    # plt.close()
     
 def visualize_image_and_mask(image, mask, title="Image and Mask"):
     plt.figure(figsize=(8, 4))

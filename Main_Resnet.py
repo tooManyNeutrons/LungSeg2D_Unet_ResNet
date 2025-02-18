@@ -192,7 +192,7 @@ def training_job():
         y_true_f = tf.keras.backend.flatten(y_true)
         y_pred_f = tf.keras.backend.flatten(y_pred)
         intersection = tf.math.reduce_sum(y_true_f * y_pred_f)
-        return 1 - (2. * intersection + smooth) / (tf.math.reduce_sum(y_true_f + y_pred_f) + smooth)
+        return 1 - (2. * intersection + smooth) / (tf.math.reduce_sum(y_true_f) + tf.math.reduce_sum(y_pred_f) + smooth)
     
     def bce_dice_loss(y_true, y_pred):
         bce = tf.keras.losses.BinaryCrossentropy()(y_true, y_pred)
