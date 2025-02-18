@@ -189,10 +189,10 @@ def training_job():
     )
 
     def dice_loss(y_true, y_pred, smooth=1e-6):
-        y_true_f = tf.keras.backend.Flatten(y_true)
-        y_pred_f = tf.keras.backend.Flatten(y_pred)
+        y_true_f = tf.keras.backend.flatten(y_true)
+        y_pred_f = tf.keras.backend.flatten(y_pred)
         intersection = tf.math.reduce_sum(y_true_f * y_pred_f)
-        return 1 - (2. * intersection + smooth) / (tf.math.reduce_sum(y_true_f) + (y_pred_f) + smooth)
+        return 1 - (2. * intersection + smooth) / (tf.math.reduce_sum(y_true_f + y_pred_f) + smooth)
     
     def bce_dice_loss(y_true, y_pred):
         bce = tf.keras.losses.BinaryCrossentropy()(y_true, y_pred)
@@ -200,8 +200,8 @@ def training_job():
         return bce + dsc
     
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=cfg.LEARNING_RATE),
-                  loss=bce_dice_loss,
-                  metrics=[sm.metrics.iou_score])
+                  loss=bce_dice_loss)
+                  #metrics=[sm.metrics.iou_score])
     
     print(model.summary())
 
