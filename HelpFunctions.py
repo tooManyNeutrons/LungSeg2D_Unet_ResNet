@@ -160,6 +160,12 @@ def read_2D_nifti_Xe_H_masks(directory, Im_size=256):
             print(f"Error loading {proton_file} or {selected_mask} in {subject_dir}: {e}")
             print("Skipping this subject.")
             continue
+    
+    # After processing all subjects, ensure all volumes have the same number of slices
+    if proton_images_list:
+        min_slices = min(vol.shape[2] for vol in proton_images_list)
+        proton_images_list = [vol[..., :min_slices] for vol in proton_images_list]
+        masks_list = [mask[..., :min_slices] for mask in masks_list]
 
     print([np.size(x) for x in proton_images_list])
     proton_images = np.array(proton_images_list, dtype=np.float32)

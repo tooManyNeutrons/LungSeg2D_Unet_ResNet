@@ -1,12 +1,12 @@
-# test_main_resnet_xe.py
+# test_main_resnet.py
 
 import time
 
 # Import your config to override certain parameters
-import config as cfg
+from LungSegmentation2D_Unet_BBResnet import config as cfg
 
 # Import your main script, which has training_job()
-import Main_Resnet_Xe  # Ensure the 'while True:' loop is removed or guarded in Main_Resnet_Xe
+from LungSegmentation2D_Unet_BBResnet import Main_Resnet as Main_Resnet  # Ensure the 'while True:' loop is removed or guarded in Main_Resnet_Xe
 
 def run_test():
     """
@@ -23,7 +23,7 @@ def run_test():
     start_time = time.time()
 
     # Now just call the training_job() function directly.
-    Main_Resnet_Xe.training_job()
+    Main_Resnet.training_job()
 
     elapsed = time.time() - start_time
     print(f"=== Test run finished in {elapsed:.2f} seconds. ===")

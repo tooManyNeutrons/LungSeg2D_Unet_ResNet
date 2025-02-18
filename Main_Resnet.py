@@ -37,13 +37,13 @@ if not hasattr(keras_utils, "generic_utils"):
 import segmentation_models as sm
 
 # Local Modules
-import HelpFunctions as HF  # Assumes this module handles data I/O
+from LungSegmentation2D_Unet_BBResnet import HelpFunctions as HF  # Assumes this module handles data I/O
 from matplotlib.widgets import Slider  # For interactive visualization
 
 # ====================================================
 # Import configuration
 # ====================================================
-import config as cfg
+from LungSegmentation2D_Unet_BBResnet import config as cfg
 
 # ====================================================
 # TRAINING JOB FUNCTION
@@ -303,7 +303,9 @@ def training_job():
 # ====================================================
 # RUN THE TRAINING JOB DAILY (Ensuring No Overlap)
 # ====================================================
-while True:
+    
+def main():
+    
     start_time = time.time()
     training_job()  # Run the training job from start to finish
     elapsed = time.time() - start_time
@@ -311,10 +313,13 @@ while True:
     sleep_time = max(0, 86400 - elapsed)
     print(f"Training job finished in {elapsed:.2f} seconds. Sleeping for {sleep_time:.2f} seconds before next run.")
     time.sleep(sleep_time)
-
-if __name__ == "__main__":
-    # Instead of the infinite while loop, run a single training job.
+    
+    # You can decide whether to run a single training job or a continuous loop.
+    # For instance, here we run a single training job.
     start_time = time.time()
-    training_job()  # Run one training job
+    training_job()
     elapsed = time.time() - start_time
     print(f"Training job finished in {elapsed:.2f} seconds.")
+
+if __name__ == "__main__":
+    main()
