@@ -161,6 +161,7 @@ def read_2D_nifti_Xe_H_masks(directory, Im_size=256):
             print("Skipping this subject.")
             continue
 
+    print([np.size(x) for x in proton_images_list])
     proton_images = np.array(proton_images_list, dtype=np.float32)
     masks = np.array(masks_list, dtype=np.uint8)
     return proton_images, masks, subject_paths

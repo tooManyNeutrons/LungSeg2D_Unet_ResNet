@@ -1,6 +1,6 @@
 [
     {
-      "DATA_PATH": "Neonatal Test Data - August 1 2024",
+      "DATA_PATH": "/home/cpir-5820/DeepLearning/neonatal/data/Neonatal Lung Segmentations - Training Data/",
       "IMAGE_SIZE": 256,
       "IMG_AUGMENTATION": {
         "rotation_range": 15,
@@ -35,7 +35,7 @@
       "MATLAB_SAVE_Y_VAL": "Xe_Y_val.mat"
     },
     {
-      "DATA_PATH": "Neonatal Test Data - August 1 2024",
+      "DATA_PATH": "/home/cpir-5820/DeepLearning/neonatal/data/Neonatal Lung Segmentations - Training Data/",
       "IMAGE_SIZE": 256,
       "IMG_AUGMENTATION": {
         "rotation_range": 15,
@@ -70,7 +70,7 @@
       "MATLAB_SAVE_Y_VAL": "Xe_Y_val.mat"
     },
     {
-      "DATA_PATH": "Neonatal Test Data - August 1 2024",
+      "DATA_PATH": "/home/cpir-5820/DeepLearning/neonatal/data/Neonatal Lung Segmentations - Training Data/",
       "IMAGE_SIZE": 256,
       "IMG_AUGMENTATION": {
         "rotation_range": 15,

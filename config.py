@@ -9,7 +9,7 @@ OUTPUT_BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(_
 # ====================================================
 # DATA LOADING & PREPROCESSING PARAMETERS
 # ====================================================
-DATA_PATH = 'Neonatal Test Data - August 1 2024'
+DATA_PATH = '/home/cpir-5820/DeepLearning/neonatal/data/Neonatal Lung Segmentations - Training Data/'
 IMAGE_SIZE = 256  # assumed square images
 
 # ====================================================

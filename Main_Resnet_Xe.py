@@ -24,11 +24,11 @@ except ImportError:
 
 # TensorFlow / Keras Imports
 import tensorflow as tf
-from tensorflow.keras import backend as K
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras import utils as keras_utils
+from keras import backend as K
+from keras._tf_keras.keras.preprocessing.image import ImageDataGenerator
+from keras._tf_keras.keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras._tf_keras.keras.optimizers import Adam
+from keras import utils as keras_utils
 # Monkey-patch: If 'generic_utils' is missing, map it to get_custom_objects
 if not hasattr(keras_utils, "generic_utils"):
     keras_utils.generic_utils = type("dummy", (), {"get_custom_objects": keras_utils.get_custom_objects})
