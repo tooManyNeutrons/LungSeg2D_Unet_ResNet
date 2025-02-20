@@ -20,7 +20,6 @@ def get_augmentations():
     Returns two dictionaries: one for image augmentation and one for mask augmentation.
     They share most parameters, but masks typically require a different fill_mode and a constant value.
     """
-    # Base augmentation settings shared by both images and masks
     base_aug = {
         'rotation_range': 15,
         'width_shift_range': 0.05,
@@ -29,17 +28,13 @@ def get_augmentations():
         'zoom_range': 0.1,
         'horizontal_flip': True,
     }
-    
-    # Image augmentation: add vertical flip (if desired) and set fill_mode appropriately
     img_aug = base_aug.copy()
-    img_aug['vertical_flip'] = False  # or True if you want vertical flips for images
+    img_aug['vertical_flip'] = False
     img_aug['fill_mode'] = 'nearest'
     
-    # Mask augmentation: use constant fill to avoid interpolating label values
     mask_aug = base_aug.copy()
     mask_aug['fill_mode'] = 'constant'
     mask_aug['cval'] = 0
-    # Note: For masks, you usually don't want to perform vertical_flip if it's not in your original settings.
     
     return img_aug, mask_aug
 
@@ -48,7 +43,7 @@ IMG_AUGMENTATION, MASK_AUGMENTATION = get_augmentations()
 # ====================================================
 # TRAINING PARAMETERS
 # ====================================================
-BATCH_SIZE = 16
+BATCH_SIZE = 16 # Change to 12 if there are errors regarding OOM.
 NUM_EPOCHS = 5
 TRAIN_TEST_SPLIT = 0.25
 LEARNING_RATE = 1e-4
